@@ -1,3 +1,5 @@
 source/.vs/
 source/TuviRestClientLib/bin/
 source/TuviRestClientLib/obj/
+source/Test/bin/
+source/Test/obj/
