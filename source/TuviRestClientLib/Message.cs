@@ -1,6 +1,6 @@
 ﻿////////////////////////////////////////////////////////////////////////////////
 //
-//   Copyright 2022 Eppie(https://eppie.io)
+//   Copyright 2023 Eppie(https://eppie.io)
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -29,38 +29,30 @@ namespace Tuvi.RestClient
         public abstract Uri Endpoint { get; }
         public abstract HttpMethod Method { get; }
         public HttpStatusCode HttpStatus { get; internal set; }
+
         internal abstract Task<HttpRequestMessage> CreateRequestAsync(Uri baseUri, CancellationToken cancellationToken);
         internal abstract Task CreateResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken);
     }
 
-    public abstract class Message<TRequest, TResponse> : Message
-            where TRequest : Request, new()
-            where TResponse : Response, new ()
+    public abstract class CommonMessage<TResponse, TRequest> : Message
+            where TResponse : Response
+            where TRequest : Request
     {
+        public TRequest Request { get; private set; }
+        public TResponse Response { get; private set; }
 
-        public TRequest Request { get; protected set; }
-        public TResponse Response { get; protected set; }
-
-        protected Message()
-        {
-            Request = new TRequest();
-            Response = new TResponse();
-        }
+        protected abstract TRequest CreateRequest();
+        protected abstract TResponse CreateResponse();
 
         internal override async Task<HttpRequestMessage> CreateRequestAsync(Uri baseUri, CancellationToken cancellationToken)
         {
-            var request = new HttpRequestMessage(Method, BuildUri(baseUri, Endpoint, Request?.QueryString));
+            var request = new HttpRequestMessage(Method, BuildUri(baseUri, Endpoint));
 
+            Request = CreateRequest();
             if (Request != null)
             {
                 Request.Headers?.UpdateHeaders(request);
-
-                // ToDo should be 'Dispose' or use 'using'
-                var content = await Request.GetContentAsync(cancellationToken).ConfigureAwait(false);
-                if (content != null)
-                {
-                    request.Content = content;
-                }
+                request.Content = await Request.GetContentAsync(cancellationToken).ConfigureAwait(false);
             }
 
             return request;
@@ -70,22 +62,38 @@ namespace Tuvi.RestClient
         {
             HttpStatus = response.StatusCode;
 
-             response.EnsureSuccessStatusCode();
+            response.EnsureSuccessStatusCode();
 
-            if(Response != null)
+            Response = CreateResponse();
+            if (Response != null)
             {
+                Response.Headers = new HeaderCollection(response.Headers);
                 await Response.ContentAsync(response.Content, cancellationToken).ConfigureAwait(false);
             }
         }
 
-        internal static Uri BuildUri(Uri baseUri, Uri relativeUri, string query)
+        internal virtual Uri BuildUri(Uri baseUri, Uri endpoint)
         {
-            Uri uri = (baseUri is null) ? relativeUri : new Uri(baseUri, relativeUri);
-
-            var uriBuilder = new UriBuilder(uri);
-            uriBuilder.Query = query;
-
-            return uriBuilder.Uri;
+            return (baseUri is null) ? endpoint : new Uri(baseUri, endpoint);
         }
     }
+
+    public abstract class Message<TResponse, TRequest> : CommonMessage<TResponse, TRequest>
+            where TResponse : Response, new()
+            where TRequest : Request, new()
+    {
+        protected sealed override TRequest CreateRequest()
+        {
+            return new TRequest();
+        }
+
+        protected sealed override TResponse CreateResponse()
+        {
+            return new TResponse();
+        }
+    }
+
+    public abstract class Message<TResponse> : Message<TResponse, EmptyRequest>
+        where TResponse : Response, new()
+    { }
 }

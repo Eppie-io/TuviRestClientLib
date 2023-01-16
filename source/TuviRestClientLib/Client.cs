@@ -1,6 +1,6 @@
 ﻿////////////////////////////////////////////////////////////////////////////////
 //
-//   Copyright 2022 Eppie(https://eppie.io)
+//   Copyright 2023 Eppie(https://eppie.io)
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ namespace Tuvi.RestClient
 {
     public class Client
     {
-        private HttpClient _httpClient;
-        private Uri _baseUri;
+        private readonly HttpClient _httpClient;
+        private readonly Uri _baseUri;
 
         public Client(HttpClient httpClient, Uri baseUri)
         {
@@ -40,26 +40,23 @@ namespace Tuvi.RestClient
             _baseUri = baseUri;
         }
 
-        public Task SendAsync(Message msg)
+        protected Task SendAsync(Message message)
         {
-            return SendAsync(msg, CancellationToken.None);
+            return SendAsync(message, CancellationToken.None);
         }
 
-        public async Task<HttpStatusCode> SendAsync(Message msg, CancellationToken cancellationToken)
+        protected async Task<HttpStatusCode> SendAsync(Message message, CancellationToken cancellationToken)
         {
-            if(msg is null)
+            if (message is null)
             {
-                throw new ArgumentNullException(nameof(msg));
+                throw new ArgumentNullException(nameof(message));
             }
 
-//            FormUrlEncodedContent
-
-            using (var request = await msg.CreateRequestAsync(_baseUri, cancellationToken).ConfigureAwait(false))
+            using (var request = await message.CreateRequestAsync(_baseUri, cancellationToken).ConfigureAwait(false))
             {
                 using (var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false))
                 {
-                    await msg.CreateResponseAsync(response, cancellationToken).ConfigureAwait(false);
-
+                    await message.CreateResponseAsync(response, cancellationToken).ConfigureAwait(false);
                     return response.StatusCode;
                 }
             }

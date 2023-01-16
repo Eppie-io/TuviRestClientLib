@@ -1,6 +1,6 @@
 ﻿////////////////////////////////////////////////////////////////////////////////
 //
-//   Copyright 2022 Eppie(https://eppie.io)
+//   Copyright 2023 Eppie(https://eppie.io)
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -16,25 +16,29 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
+using Tuvi.RestClient.Utils;
 
+[assembly: InternalsVisibleTo("Tuvi.RestClient.Test")]
 namespace Tuvi.RestClient
 {
-    public class MessageHeaders
+    public class HeaderCollection : IEnumerable<KeyValuePair<string, IEnumerable<string>>>
     {
-        private bool _headerValidation;
+        private readonly bool _headerValidation;
 
         private IEnumerable<KeyValuePair<string, IEnumerable<string>>> Headers { get; set; }
 
-        public MessageHeaders(IEnumerable<KeyValuePair<string, IEnumerable<string>>> headers, bool headerValidation = true)
+        public HeaderCollection(IEnumerable<KeyValuePair<string, IEnumerable<string>>> headers, bool headerValidation = true)
         {
             _headerValidation = headerValidation;
             Headers = headers;
         }
 
-        public MessageHeaders(IEnumerable<KeyValuePair<string, string>> headers, bool headerValidation = false)
+        public HeaderCollection(IEnumerable<KeyValuePair<string, string>> headers, bool headerValidation = false)
         {
             _headerValidation = headerValidation;
             Headers = headers.Select((header) =>
@@ -43,7 +47,7 @@ namespace Tuvi.RestClient
             });
         }
 
-        public MessageHeaders(IEnumerable<(string, string)> headers, bool headerValidation = false)
+        public HeaderCollection(IEnumerable<(string, string)> headers, bool headerValidation = false)
         {
             _headerValidation = headerValidation;
             Headers = headers.Select((header) =>
@@ -65,6 +69,21 @@ namespace Tuvi.RestClient
                     httpRequest.Headers.TryAddWithoutValidation(header.Key, header.Value);
                 }
             }
+        }
+
+        public IEnumerator<KeyValuePair<string, IEnumerable<string>>> GetEnumerator()
+        {
+            return Headers.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public static HeaderCollection Create(object obj, bool headerValidation = false)
+        {
+            return new HeaderCollection(ObjectConverter.Convert(obj), headerValidation);
         }
     }
 }

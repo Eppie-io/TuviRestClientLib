@@ -1,6 +1,6 @@
 ﻿////////////////////////////////////////////////////////////////////////////////
 //
-//   Copyright 2022 Eppie(https://eppie.io)
+//   Copyright 2023 Eppie(https://eppie.io)
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-using System;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -27,7 +28,7 @@ namespace Tuvi.RestClient
 {
     public class Response
     {
-        public MessageHeaders Headers { get; internal set; }
+        public HeaderCollection Headers { get; internal set; }
         internal virtual Task ContentAsync(HttpContent content, CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
@@ -45,31 +46,45 @@ namespace Tuvi.RestClient
         {
             if (content != null)
             {
-                Content =  await content.ReadAsStringAsync().ConfigureAwait(false);
+                Content = await content.ReadAsStringAsync().ConfigureAwait(false);
             }
         }
     }
 
     public class JsonResponse<TContent> : Response
-        where TContent : struct
     {
         public TContent Content { get; protected set; }
         public JsonSerializerOptions Options { get; set; }
 
         internal override async Task ContentAsync(HttpContent content, CancellationToken cancellationToken)
         {
-            try
-            {
-                Content = await content.ReadFromJsonAsync<TContent>(Options, cancellationToken).ConfigureAwait(false);
-            }
-            catch (NotSupportedException) // When content type is not valid
-            {
-                //Console.WriteLine("The content type is not supported.");
-            }
-            catch (JsonException) // Invalid JSON
-            {
-                //Console.WriteLine("Invalid JSON.");
-            }
+            Content = await content.ReadFromJsonAsync<TContent>(Options, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    public class HeadResponse : Response
+    {
+        public HeaderCollection ContentHeaders { get; protected set; }
+
+        internal override Task ContentAsync(HttpContent content, CancellationToken cancellationToken)
+        {
+            ContentHeaders = new HeaderCollection(content.Headers, false);
+            return Task.CompletedTask;
+        }
+
+        public HeaderCollection GetAllHeaders()
+        {
+            return new HeaderCollection(Headers.Concat(ContentHeaders), false);
+        }
+    }
+
+    public class StreamResponse : Response
+    {
+        public Stream Stream { get; set; }
+
+        internal override Task ContentAsync(HttpContent content, CancellationToken cancellationToken)
+        {
+            return content.CopyToAsync(Stream);
         }
     }
 }

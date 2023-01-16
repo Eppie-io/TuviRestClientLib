@@ -1,6 +1,6 @@
 ﻿////////////////////////////////////////////////////////////////////////////////
 //
-//   Copyright 2022 Eppie(https://eppie.io)
+//   Copyright 2023 Eppie(https://eppie.io)
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -24,22 +24,14 @@ using System.Threading.Tasks;
 
 namespace Tuvi.RestClient
 {
-    public class Request //: IDisposable
+    public class Request
     {
-        public MessageHeaders Headers { get; set; }
-        public MessageQuery Query { get; set; }
-        internal string QueryString { get => Query?.QueryString ?? string.Empty; }
+        public HeaderCollection Headers { get; set; }
+
         internal virtual Task<HttpContent> GetContentAsync(CancellationToken cancellationToken)
         {
             return Task.FromResult<HttpContent>(null);
         }
-
-        //public static Request Empty { get; } = new EmptyRequest { };
-
-        //public void Dispose()
-        //{
-        //    Content.Dispose();
-        //}
     }
 
     public class EmptyRequest : Request
@@ -56,23 +48,12 @@ namespace Tuvi.RestClient
     }
 
     public class JsonRequest<TJsonPayload> : Request
-        where TJsonPayload : struct
     {
-        // ToDo for .NET Standard 2.1 we can use  MediaTypeNames.Application.Json (Namespace: System.Net.Mime)
-
-        // https://learn.microsoft.com/en-us/dotnet/api/system.net.mime.mediatypenames.application.json?view=netstandard-2.1
-        public const string MediaTypeJson = "application/json";
-
         public TJsonPayload Payload { get; set; }
         public JsonSerializerOptions Options { get; set; }
 
         internal override Task<HttpContent> GetContentAsync(CancellationToken cancellationToken)
         {
-            //return Task.FromResult<HttpContent>(JsonContent.Create(
-            //                          inputValue: Payload,
-            //                          mediaType: new MediaTypeHeaderValue(MediaTypeJson),
-            //                          options: Options));
-
             return Task.FromResult<HttpContent>(JsonContent.Create(inputValue: Payload, options: Options));
         }
     }
