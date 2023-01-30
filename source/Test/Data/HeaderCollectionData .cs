@@ -21,7 +21,7 @@ using System.Collections;
 
 namespace Tuvi.RestClient.Test.Data
 {
-    internal partial class HeaderCollectionData
+    internal partial class HeaderCollectionTestData
     {
         public static IEnumerable HeaderTupleParams
         {

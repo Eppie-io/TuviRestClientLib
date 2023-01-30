@@ -22,9 +22,9 @@ using Tuvi.RestClient.Utils;
 
 namespace Tuvi.RestClient.Test.Data
 {
-    internal partial class QueryParametersData
+    internal partial class QueryParametersTestData
     {
-        public struct StructData
+        public struct StructTestData
         {
             public string StringParam { get; set; }
             public int IntParam { get; set; }
@@ -32,12 +32,12 @@ namespace Tuvi.RestClient.Test.Data
             public bool? BoolParam { get; set; }
         }
 
-        public struct AttributeData
+        public struct AttributeTestData
         {
             [ParameterName("WellNamedParam")]
             public int? WrongNamedParam { get; set; }
 
-            [ParameterConverter(typeof(AttributeData), nameof(Convert))]
+            [ParameterConverter(typeof(AttributeTestData), nameof(Convert))]
             public int? ConvertParam { get; set; }
 
             public static string? Convert(object? obj)
@@ -76,26 +76,26 @@ namespace Tuvi.RestClient.Test.Data
         {
             get
             {
-                yield return new TestCaseData(new StructData
+                yield return new TestCaseData(new StructTestData
                 {
                     StringParam = "!_.0-9A-Za-z(*)",
                     IntParam = int.MinValue,
                     DoubleParam = double.E,
-                }, $"{nameof(StructData.StringParam)}=!_.0-9A-Za-z(*)&{nameof(StructData.IntParam)}={int.MinValue}&{nameof(StructData.DoubleParam)}={double.E}");
+                }, $"{nameof(StructTestData.StringParam)}=!_.0-9A-Za-z(*)&{nameof(StructTestData.IntParam)}={int.MinValue}&{nameof(StructTestData.DoubleParam)}={double.E}");
 
-                yield return new TestCaseData(new StructData
+                yield return new TestCaseData(new StructTestData
                 {
                     StringParam = """' @#$%^=":;<>,?/\|+&""",
                     IntParam = int.MaxValue,
                     DoubleParam = double.Pi,
                     BoolParam = false,
-                }, $"{nameof(StructData.StringParam)}=%27+%40%23%24%25%5e%3d%22%3a%3b%3c%3e%2c%3f%2f%5c%7c%2b%26&{nameof(StructData.IntParam)}={int.MaxValue}&{nameof(StructData.DoubleParam)}={double.Pi}&{nameof(StructData.BoolParam)}={bool.FalseString}");
+                }, $"{nameof(StructTestData.StringParam)}=%27+%40%23%24%25%5e%3d%22%3a%3b%3c%3e%2c%3f%2f%5c%7c%2b%26&{nameof(StructTestData.IntParam)}={int.MaxValue}&{nameof(StructTestData.DoubleParam)}={double.Pi}&{nameof(StructTestData.BoolParam)}={bool.FalseString}");
 
-                yield return new TestCaseData(new AttributeData
+                yield return new TestCaseData(new AttributeTestData
                 {
                     WrongNamedParam = 0,
                     ConvertParam = int.MaxValue,
-                }, $"WellNamedParam=0&{nameof(AttributeData.ConvertParam)}={AttributeData.Convert(int.MaxValue)}");
+                }, $"WellNamedParam=0&{nameof(AttributeTestData.ConvertParam)}={AttributeTestData.Convert(int.MaxValue)}");
             }
         }
     }

@@ -41,8 +41,8 @@ namespace Tuvi.RestClient.Test
         }
 
         [Test]
-        [TestCaseSource(typeof(Data.QueryParametersData), nameof(Data.QueryParametersData.QueryTupleParams))]
-        [TestCaseSource(typeof(Data.QueryParametersData), nameof(Data.QueryParametersData.QueryUnicodeParams))]
+        [TestCaseSource(typeof(Data.QueryParametersTestData), nameof(Data.QueryParametersTestData.QueryTupleParams))]
+        [TestCaseSource(typeof(Data.QueryParametersTestData), nameof(Data.QueryParametersTestData.QueryUnicodeParams))]
         public void TupleTest(IEnumerable<(string, string)> query, string result)
         {
             var queryParams = new QueryParameters(query);
@@ -50,7 +50,7 @@ namespace Tuvi.RestClient.Test
         }
 
         [Test]
-        [TestCaseSource(typeof(Data.QueryParametersData), nameof(Data.QueryParametersData.QueryPairParams))]
+        [TestCaseSource(typeof(Data.QueryParametersTestData), nameof(Data.QueryParametersTestData.QueryPairParams))]
         public void PairTest(IEnumerable<KeyValuePair<string, string?>> query, string result)
         {
             var queryParams = new QueryParameters(query);
@@ -58,7 +58,7 @@ namespace Tuvi.RestClient.Test
         }
 
         [Test]
-        [TestCaseSource(typeof(Data.QueryParametersData), nameof(Data.QueryParametersData.QueryStructParams))]
+        [TestCaseSource(typeof(Data.QueryParametersTestData), nameof(Data.QueryParametersTestData.QueryStructParams))]
         public void StructTest(object query, string result)
         {
             var queryParams = QueryParameters.Create(query);

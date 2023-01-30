@@ -78,7 +78,7 @@ namespace Tuvi.RestClient
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            throw new System.NotImplementedException();
+            return Headers.GetEnumerator();
         }
 
         public static HeaderCollection Create(object obj, bool headerValidation = false)

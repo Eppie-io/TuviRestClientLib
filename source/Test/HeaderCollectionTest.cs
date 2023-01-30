@@ -22,7 +22,7 @@ namespace Tuvi.RestClient.Test
 {
     public class HeaderCollectionTest
     {
-        [TestCaseSource(typeof(Data.HeaderCollectionData), nameof(Data.HeaderCollectionData.HeaderTupleParams))]
+        [TestCaseSource(typeof(Data.HeaderCollectionTestData), nameof(Data.HeaderCollectionTestData.HeaderTupleParams))]
         public void TupleTest(IEnumerable<(string, string)> headers)
         {
             var headerCollection = new HeaderCollection(headers);
@@ -37,7 +37,7 @@ namespace Tuvi.RestClient.Test
             }
         }
 
-        [TestCaseSource(typeof(Data.HeaderCollectionData), nameof(Data.HeaderCollectionData.HeaderPairParams))]
+        [TestCaseSource(typeof(Data.HeaderCollectionTestData), nameof(Data.HeaderCollectionTestData.HeaderPairParams))]
         public void PairTest(
             IEnumerable<KeyValuePair<string, IEnumerable<string>>> headers,
             IEnumerable<(string, string)>? hasHeaders = null,

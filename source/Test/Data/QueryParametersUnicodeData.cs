@@ -21,7 +21,7 @@ using System.Collections;
 
 namespace Tuvi.RestClient.Test.Data
 {
-    internal partial class QueryParametersData
+    internal partial class QueryParametersTestData
     {
         public static IEnumerable QueryUnicodeParams
         {
