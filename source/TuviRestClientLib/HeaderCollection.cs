@@ -50,7 +50,7 @@ namespace Tuvi.RestClient
         public HeaderCollection(IEnumerable<(string, string)> headers, bool headerValidation = false)
         {
             _headerValidation = headerValidation;
-            Headers = headers.Select((header) =>
+            Headers = headers?.Select((header) =>
             {
                 return new KeyValuePair<string, IEnumerable<string>>(header.Item1, new[] { header.Item2 });
             });
@@ -60,6 +60,11 @@ namespace Tuvi.RestClient
         {
             foreach (var header in Headers ?? Enumerable.Empty<KeyValuePair<string, IEnumerable<string>>>())
             {
+                if(header.Key is null || header.Value is null)
+                {
+                    continue;
+                }
+
                 if (_headerValidation)
                 {
                     httpRequest.Headers.Add(header.Key, header.Value);

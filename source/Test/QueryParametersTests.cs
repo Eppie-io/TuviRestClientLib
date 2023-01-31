@@ -64,5 +64,26 @@ namespace Tuvi.RestClient.Test
             var queryParams = QueryParameters.Create(query);
             Assert.That(queryParams.ToString(), Is.EqualTo(result));
         }
+
+        [Test]
+        public void NullTest()
+        {
+            {
+                string? query = null;
+                Assert.Throws<ArgumentNullException>(() => new QueryParameters(query));
+            }
+
+            {
+                IEnumerable<KeyValuePair<string, string>>? query = null;
+                Assert.Throws<ArgumentNullException>(() => new QueryParameters(query));
+            }
+
+            {
+                IEnumerable<(string key, string value)>? query = null;
+                Assert.Throws<ArgumentNullException>(() => new QueryParameters(query));
+            }
+
+            Assert.Throws<ArgumentNullException>(() => QueryParameters.Create(null));
+        }
     }
 }

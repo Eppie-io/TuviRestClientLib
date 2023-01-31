@@ -52,10 +52,13 @@ namespace Tuvi.RestClient.Test.Data
             {
                 yield return new TestCaseData(new[] { ("param1", "value1"), ("param2", "value2") }, "param1=value1&param2=value2");
                 yield return new TestCaseData(new[] { ("param2", "value2"), ("param1", "value1") }, "param2=value2&param1=value1");
-                yield return new TestCaseData(new (string, string?)[] { ("param", "value"), ("param2", null) }, "param=value");
+                yield return new TestCaseData(new (string, string?)[] { ("param1", null), ("param2", string.Empty), ("param3", " ") }, "param2=&param3=+");
                 yield return new TestCaseData(new[] { ("param", "foo bar") }, "param=foo+bar");
                 yield return new TestCaseData(new[] { ("param", "!_.0-9A-Za-z(*)") }, "param=!_.0-9A-Za-z(*)");
                 yield return new TestCaseData(new[] { ("param", """'@#$%^=":;<>,?/\|+&""") }, "param=%27%40%23%24%25%5e%3d%22%3a%3b%3c%3e%2c%3f%2f%5c%7c%2b%26");
+                yield return new TestCaseData(new (string, string?)[] { ("param", null) }, string.Empty);
+                yield return new TestCaseData(new (string?, string?)[] { (null, null) }, string.Empty);
+                yield return new TestCaseData(new (string?, string?)[] { (null, "value"), (" ", "value"), (string.Empty, "value") }, string.Empty);
             }
         }
 

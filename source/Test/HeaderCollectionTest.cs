@@ -23,24 +23,29 @@ namespace Tuvi.RestClient.Test
     public class HeaderCollectionTest
     {
         [TestCaseSource(typeof(Data.HeaderCollectionTestData), nameof(Data.HeaderCollectionTestData.HeaderTupleParams))]
-        public void TupleTest(IEnumerable<(string, string)> headers)
+        public void TupleTest(IEnumerable<(string?, string?)> headers, IEnumerable<(string?, string?)>? result)
         {
+            result ??= headers;
+
             var headerCollection = new HeaderCollection(headers);
 
             using var request = new HttpRequestMessage();
             headerCollection.UpdateHeaders(request);
 
-            foreach ((var header, var value) in headers ?? Enumerable.Empty<(string, string)>())
+            foreach ((var header, var value) in result ?? Enumerable.Empty<(string?, string?)>())
             {
-                var values = request.Headers.GetValues(header);
-                Assert.That(values, Does.Contain(value));
+                if (header is not null)
+                {
+                    var values = request.Headers.GetValues(header);
+                    Assert.That(values, Does.Contain(value));
+                }
             }
         }
 
         [TestCaseSource(typeof(Data.HeaderCollectionTestData), nameof(Data.HeaderCollectionTestData.HeaderPairParams))]
         public void PairTest(
-            IEnumerable<KeyValuePair<string, IEnumerable<string>>> headers,
-            IEnumerable<(string, string)>? hasHeaders = null,
+            IEnumerable<KeyValuePair<string, IEnumerable<string?>?>> headers,
+            IEnumerable<(string, string)>? addedHeaders = null,
             IEnumerable<(string, bool)>? notHeaders = null)
         {
             var headerCollection = new HeaderCollection(headers, false);
@@ -48,7 +53,7 @@ namespace Tuvi.RestClient.Test
             using var request = new HttpRequestMessage();
             headerCollection.UpdateHeaders(request);
 
-            foreach ((var header, var value) in hasHeaders ?? Enumerable.Empty<(string, string)>())
+            foreach ((var header, var value) in addedHeaders ?? Enumerable.Empty<(string, string)>())
             {
                 var values = request.Headers.GetValues(header);
                 Assert.That(values, Does.Contain(value));
@@ -64,6 +69,30 @@ namespace Tuvi.RestClient.Test
                 {
                     Assert.That(request.Headers.Contains(header), Is.False);
                 }
+            }
+        }
+
+        [Test]
+        public void NullTest()
+        {
+            {
+                IEnumerable<KeyValuePair<string, IEnumerable<string>>>? headers = null;
+                var headerCollection = new HeaderCollection(headers, false);
+
+                using var request = new HttpRequestMessage();
+                headerCollection.UpdateHeaders(request);
+
+                Assert.That(request.Headers, Is.Empty);
+            }
+
+            {
+                IEnumerable<(string, string)>? headers = null;
+                var headerCollection = new HeaderCollection(headers, false);
+
+                using var request = new HttpRequestMessage();
+                headerCollection.UpdateHeaders(request);
+
+                Assert.That(request.Headers, Is.Empty);
             }
         }
     }

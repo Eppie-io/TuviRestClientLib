@@ -64,10 +64,18 @@ namespace Tuvi.RestClient
 
             foreach (var parameter in query)
             {
-                collection.Add(parameter.Key, parameter.Value);
+                if(IsKeyCorrect(parameter.Key))
+                {
+                    collection.Add(parameter.Key, parameter.Value);
+                }
             }
 
             return collection;
+        }
+
+        private static bool IsKeyCorrect(string key)
+        {
+            return !string.IsNullOrWhiteSpace(key);
         }
     }
 }
