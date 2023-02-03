@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>Tuvi.Rest.Client</RootNamespace>
+    <RootNamespace>Tuvi.RestClient</RootNamespace>
     <AnalysisLevel>6.0-all</AnalysisLevel>
   </PropertyGroup>
 
@@ -15,5 +15,9 @@
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <WarningLevel>9999</WarningLevel>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Net.Http.Json" Version="7.0.0" />
+  </ItemGroup>
 
 </Project>
