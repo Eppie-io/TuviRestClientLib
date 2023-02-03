@@ -58,7 +58,10 @@ namespace Tuvi.RestClient
 
         internal override async Task ContentAsync(HttpContent content, CancellationToken cancellationToken)
         {
-            Content = await content.ReadFromJsonAsync<TContent>(Options, cancellationToken).ConfigureAwait(false);
+            if (content != null)
+            {
+                Content = await content.ReadFromJsonAsync<TContent>(Options, cancellationToken).ConfigureAwait(false);
+            }
         }
     }
 
@@ -68,7 +71,11 @@ namespace Tuvi.RestClient
 
         internal override Task ContentAsync(HttpContent content, CancellationToken cancellationToken)
         {
-            ContentHeaders = new HeaderCollection(content.Headers, false);
+            if (content != null)
+            {
+                ContentHeaders = new HeaderCollection(content.Headers, false);
+            }
+
             return Task.CompletedTask;
         }
 
@@ -84,7 +91,12 @@ namespace Tuvi.RestClient
 
         internal override Task ContentAsync(HttpContent content, CancellationToken cancellationToken)
         {
-            return content.CopyToAsync(Stream);
+            if (content != null)
+            {
+                return content.CopyToAsync(Stream);
+            }
+
+            return Task.CompletedTask;
         }
     }
 }
