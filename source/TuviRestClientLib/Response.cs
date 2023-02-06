@@ -29,7 +29,7 @@ namespace Tuvi.RestClient
     public class Response
     {
         public HeaderCollection Headers { get; internal set; }
-        internal virtual Task ContentAsync(HttpContent content, CancellationToken cancellationToken)
+        internal virtual Task ReadContentAsync(HttpContent content, CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
         }
@@ -42,7 +42,7 @@ namespace Tuvi.RestClient
     {
         public string Content { get; protected set; }
 
-        internal override async Task ContentAsync(HttpContent content, CancellationToken cancellationToken)
+        internal override async Task ReadContentAsync(HttpContent content, CancellationToken cancellationToken)
         {
             if (content != null)
             {
@@ -56,9 +56,12 @@ namespace Tuvi.RestClient
         public TContent Content { get; protected set; }
         public JsonSerializerOptions Options { get; set; }
 
-        internal override async Task ContentAsync(HttpContent content, CancellationToken cancellationToken)
+        internal override async Task ReadContentAsync(HttpContent content, CancellationToken cancellationToken)
         {
-            Content = await content.ReadFromJsonAsync<TContent>(Options, cancellationToken).ConfigureAwait(false);
+            if (content != null)
+            {
+                Content = await content.ReadFromJsonAsync<TContent>(Options, cancellationToken).ConfigureAwait(false);
+            }
         }
     }
 
@@ -66,9 +69,13 @@ namespace Tuvi.RestClient
     {
         public HeaderCollection ContentHeaders { get; protected set; }
 
-        internal override Task ContentAsync(HttpContent content, CancellationToken cancellationToken)
+        internal override Task ReadContentAsync(HttpContent content, CancellationToken cancellationToken)
         {
-            ContentHeaders = new HeaderCollection(content.Headers, false);
+            if (content != null)
+            {
+                ContentHeaders = new HeaderCollection(content.Headers, false);
+            }
+
             return Task.CompletedTask;
         }
 
@@ -82,9 +89,14 @@ namespace Tuvi.RestClient
     {
         public Stream Stream { get; set; }
 
-        internal override Task ContentAsync(HttpContent content, CancellationToken cancellationToken)
+        internal override Task ReadContentAsync(HttpContent content, CancellationToken cancellationToken)
         {
-            return content.CopyToAsync(Stream);
+            if (content != null)
+            {
+                return content.CopyToAsync(Stream);
+            }
+
+            return Task.CompletedTask;
         }
     }
 }

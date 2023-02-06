@@ -52,7 +52,7 @@ namespace Tuvi.RestClient
             if (Request != null)
             {
                 Request.Headers?.UpdateHeaders(request);
-                request.Content = await Request.GetContentAsync(cancellationToken).ConfigureAwait(false);
+                request.Content = await Request.CreateContentAsync(cancellationToken).ConfigureAwait(false);
             }
 
             return request;
@@ -62,14 +62,14 @@ namespace Tuvi.RestClient
         {
             HttpStatus = response.StatusCode;
 
-            response.EnsureSuccessStatusCode();
-
             Response = CreateResponse();
             if (Response != null)
             {
                 Response.Headers = new HeaderCollection(response.Headers);
-                await Response.ContentAsync(response.Content, cancellationToken).ConfigureAwait(false);
+                await Response.ReadContentAsync(response.Content, cancellationToken).ConfigureAwait(false);
             }
+
+            response.EnsureSuccessStatusCode();
         }
 
         internal virtual Uri BuildUri(Uri baseUri, Uri endpoint)

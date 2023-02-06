@@ -28,7 +28,7 @@ namespace Tuvi.RestClient
     {
         public HeaderCollection Headers { get; set; }
 
-        internal virtual Task<HttpContent> GetContentAsync(CancellationToken cancellationToken)
+        internal virtual Task<HttpContent> CreateContentAsync(CancellationToken cancellationToken)
         {
             return Task.FromResult<HttpContent>(null);
         }
@@ -41,7 +41,7 @@ namespace Tuvi.RestClient
     {
         public string Payload { get; set; }
 
-        internal override Task<HttpContent> GetContentAsync(CancellationToken cancellationToken)
+        internal override Task<HttpContent> CreateContentAsync(CancellationToken cancellationToken)
         {
             return Task.FromResult<HttpContent>(new StringContent(Payload));
         }
@@ -52,7 +52,7 @@ namespace Tuvi.RestClient
         public TJsonPayload Payload { get; set; }
         public JsonSerializerOptions Options { get; set; }
 
-        internal override Task<HttpContent> GetContentAsync(CancellationToken cancellationToken)
+        internal override Task<HttpContent> CreateContentAsync(CancellationToken cancellationToken)
         {
             return Task.FromResult<HttpContent>(JsonContent.Create(inputValue: Payload, options: Options));
         }
