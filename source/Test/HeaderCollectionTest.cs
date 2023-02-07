@@ -75,24 +75,79 @@ namespace Tuvi.RestClient.Test
         [Test]
         public void NullTest()
         {
+            Assert.Throws<ArgumentNullException>(() =>
             {
                 IEnumerable<KeyValuePair<string, IEnumerable<string>>>? headers = null;
                 var headerCollection = new HeaderCollection(headers, false);
+            });
 
-                using var request = new HttpRequestMessage();
-                headerCollection.UpdateHeaders(request);
-
-                Assert.That(request.Headers, Is.Empty);
-            }
-
+            Assert.Throws<ArgumentNullException>(() =>
             {
                 IEnumerable<(string, string)>? headers = null;
                 var headerCollection = new HeaderCollection(headers, false);
+            });
 
-                using var request = new HttpRequestMessage();
-                headerCollection.UpdateHeaders(request);
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                IEnumerable<KeyValuePair<string, string>>? headers = null;
+                var headerCollection = new HeaderCollection(headers, false);
+            });
 
-                Assert.That(request.Headers, Is.Empty);
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                var headerCollection = HeaderCollection.Create(null);
+            });
+
+            var headerCollection = HeaderCollection.Create(new Data.HeaderCollectionTestData.EmptyTestStructure());
+
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                IEnumerable<KeyValuePair<string, IEnumerable<string>>>? headers = null;
+                headerCollection.Add(headers);
+            });
+
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                IEnumerable<(string, string)>? headers = null;
+                headerCollection.Add(headers);
+            });
+
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                IEnumerable<KeyValuePair<string, string>>? headers = null;
+                headerCollection.Add(headers);
+            });
+        }
+
+        [TestCaseSource(typeof(Data.HeaderCollectionTestData), nameof(Data.HeaderCollectionTestData.AdditionalHeadersParams))]
+        public void AddHeadersTest(
+            IEnumerable<(string?, string?)> headers,
+            IEnumerable<(string?, string?)> extraHeaders,
+            IEnumerable<(string, string?)> result,
+            IEnumerable<(string, bool)> notHeaders)
+        {
+            var headerCollection = new HeaderCollection(headers);
+            headerCollection.Add(extraHeaders);
+
+            using var request = new HttpRequestMessage();
+            headerCollection.UpdateHeaders(request);
+
+            foreach ((var header, var value) in result ?? Enumerable.Empty<(string, string?)>())
+            {
+                var values = request.Headers.GetValues(header);
+                Assert.That(values, Does.Contain(value));
+            }
+
+            foreach ((var header, var assert) in notHeaders ?? Enumerable.Empty<(string, bool)>())
+            {
+                if (assert)
+                {
+                    Assert.Throws<FormatException>(() => request.Headers.Contains(header));
+                }
+                else
+                {
+                    Assert.That(request.Headers.Contains(header), Is.False);
+                }
             }
         }
     }

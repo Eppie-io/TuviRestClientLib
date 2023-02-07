@@ -64,7 +64,7 @@ namespace Tuvi.RestClient
 
             foreach (var parameter in query)
             {
-                if(IsKeyCorrect(parameter.Key))
+                if (IsKeyCorrect(parameter.Key))
                 {
                     collection.Add(parameter.Key, parameter.Value);
                 }

@@ -16,6 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,17 +30,31 @@ namespace Tuvi.RestClient
     public class HeaderCollection : IEnumerable<KeyValuePair<string, IEnumerable<string>>>
     {
         private readonly bool _headerValidation;
-
-        private IEnumerable<KeyValuePair<string, IEnumerable<string>>> Headers { get; set; }
+        private IEnumerable<KeyValuePair<string, IEnumerable<string>>> _headers;
+        private IEnumerable<KeyValuePair<string, IEnumerable<string>>> Headers
+        {
+            get => _headers ?? Enumerable.Empty<KeyValuePair<string, IEnumerable<string>>>();
+            set => _headers = value;
+        }
 
         public HeaderCollection(IEnumerable<KeyValuePair<string, IEnumerable<string>>> headers, bool headerValidation = true)
         {
+            if (headers is null)
+            {
+                throw new ArgumentNullException(nameof(headers));
+            }
+
             _headerValidation = headerValidation;
             Headers = headers;
         }
 
         public HeaderCollection(IEnumerable<KeyValuePair<string, string>> headers, bool headerValidation = false)
         {
+            if (headers is null)
+            {
+                throw new ArgumentNullException(nameof(headers));
+            }
+
             _headerValidation = headerValidation;
             Headers = headers.Select((header) =>
             {
@@ -49,18 +64,59 @@ namespace Tuvi.RestClient
 
         public HeaderCollection(IEnumerable<(string, string)> headers, bool headerValidation = false)
         {
+            if (headers is null)
+            {
+                throw new ArgumentNullException(nameof(headers));
+            }
+
             _headerValidation = headerValidation;
-            Headers = headers?.Select((header) =>
+            Headers = headers.Select((header) =>
             {
                 return new KeyValuePair<string, IEnumerable<string>>(header.Item1, new[] { header.Item2 });
             });
         }
 
+        public void Add(IEnumerable<(string, string)> headers)
+        {
+            if (headers is null)
+            {
+                throw new ArgumentNullException(nameof(headers));
+            }
+
+            Add(headers.Select((header) =>
+            {
+                return new KeyValuePair<string, IEnumerable<string>>(header.Item1, new[] { header.Item2 });
+            }));
+        }
+
+        public void Add(IEnumerable<KeyValuePair<string, string>> headers)
+        {
+            if (headers is null)
+            {
+                throw new ArgumentNullException(nameof(headers));
+            }
+
+            Add(headers.Select((header) =>
+            {
+                return new KeyValuePair<string, IEnumerable<string>>(header.Key, new[] { header.Value });
+            }));
+        }
+
+        public void Add(IEnumerable<KeyValuePair<string, IEnumerable<string>>> headers)
+        {
+            if (headers is null)
+            {
+                throw new ArgumentNullException(nameof(headers));
+            }
+
+            Headers = Headers.Concat(headers);
+        }
+
         internal void UpdateHeaders(HttpRequestMessage httpRequest)
         {
-            foreach (var header in Headers ?? Enumerable.Empty<KeyValuePair<string, IEnumerable<string>>>())
+            foreach (var header in Headers)
             {
-                if(header.Key is null || header.Value is null)
+                if (header.Key is null || header.Value is null)
                 {
                     continue;
                 }
@@ -83,7 +139,7 @@ namespace Tuvi.RestClient
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return Headers.GetEnumerator();
+            return GetEnumerator();
         }
 
         public static HeaderCollection Create(object obj, bool headerValidation = false)
