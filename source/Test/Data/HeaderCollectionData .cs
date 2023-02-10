@@ -23,6 +23,9 @@ namespace Tuvi.RestClient.Test.Data
 {
     internal partial class HeaderCollectionTestData
     {
+        public struct EmptyTestStructure
+        { }
+
         public static IEnumerable HeaderTupleParams
         {
             get
@@ -90,6 +93,53 @@ namespace Tuvi.RestClient.Test.Data
                     {
                         ( "header1", false ),
                         ( "header2", false ),
+                    }
+                );
+            }
+        }
+
+        public static IEnumerable AdditionalHeadersParams
+        {
+            get
+            {
+                yield return new TestCaseData(
+                    new[]
+                    {
+                        ( "header1", "value1" ),
+                        ( "header1", "value2" ),
+                        ( "header1", "value3" ),
+                        ( "header2", "value1" ),
+                        ( "header2", "value2" ),
+                        ( "header3", "value1" ),
+                        ( "header4", string.Empty ),
+                    },
+                    new[]
+                    {
+                        ( "header1", "value4" ),
+                        ( "header2", "value3" ),
+                        ( "header2", "value4" ),
+                        ( "header4", "value1" ),
+                        ( "header5", "value1" ),
+                        ( "wrong-name-@#$%^()*&^%", "value1" ),
+                    },
+                    new[]
+                    {
+                        ( "header1", "value1" ),
+                        ( "header1", "value2" ),
+                        ( "header1", "value3" ),
+                        ( "header1", "value4" ),
+                        ( "header2", "value1" ),
+                        ( "header2", "value2" ),
+                        ( "header2", "value3" ),
+                        ( "header2", "value4" ),
+                        ( "header3", "value1" ),
+                        ( "header4", "value1" ),
+                        ( "header5", "value1" ),
+                    },
+                    new[]
+                    {
+                        ( "header6", false ),
+                        ( "wrong-name-@#$%^()*&^%", true ),
                     }
                 );
             }

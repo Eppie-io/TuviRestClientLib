@@ -29,7 +29,7 @@ namespace Tuvi.RestClient
     public class Response
     {
         public HeaderCollection Headers { get; internal set; }
-        internal virtual Task ReadContentAsync(HttpContent content, CancellationToken cancellationToken)
+        protected internal virtual Task ReadContentAsync(HttpContent content, CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
         }
@@ -42,7 +42,7 @@ namespace Tuvi.RestClient
     {
         public string Content { get; protected set; }
 
-        internal override async Task ReadContentAsync(HttpContent content, CancellationToken cancellationToken)
+        protected internal override async Task ReadContentAsync(HttpContent content, CancellationToken cancellationToken)
         {
             if (content != null)
             {
@@ -56,7 +56,7 @@ namespace Tuvi.RestClient
         public TContent Content { get; protected set; }
         public JsonSerializerOptions Options { get; set; }
 
-        internal override async Task ReadContentAsync(HttpContent content, CancellationToken cancellationToken)
+        protected internal override async Task ReadContentAsync(HttpContent content, CancellationToken cancellationToken)
         {
             if (content != null)
             {
@@ -69,7 +69,7 @@ namespace Tuvi.RestClient
     {
         public HeaderCollection ContentHeaders { get; protected set; }
 
-        internal override Task ReadContentAsync(HttpContent content, CancellationToken cancellationToken)
+        protected internal override Task ReadContentAsync(HttpContent content, CancellationToken cancellationToken)
         {
             if (content != null)
             {
@@ -89,7 +89,7 @@ namespace Tuvi.RestClient
     {
         public Stream Stream { get; set; }
 
-        internal override Task ReadContentAsync(HttpContent content, CancellationToken cancellationToken)
+        protected internal override Task ReadContentAsync(HttpContent content, CancellationToken cancellationToken)
         {
             if (content != null)
             {
