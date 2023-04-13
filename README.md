@@ -1,11 +1,11 @@
 # TuviRestClientLib: .NET REST Client
 
-`TuviRestClientLib` is a .NET Standard 2.0 based C# Library that can interact with REST APIs.
+`TuviRestClientLib` is a .NET Standard 2.0 C# Library for interaction with REST APIs.
 
-## List of the features
+## Features
 
-- Supports default HTTP Methods (GET, POST, PUT, HEAD, DELETE,  PATCH).
-- Transform request and response data (System.Text.Json serialization).
+- Default HTTP Methods (GET, POST, PUT, HEAD, DELETE, PATCH) support.
+- Request and response serialization with System.Text.Json.
 - Dependency Injection Support.
 
 ## Example Usage
