@@ -63,13 +63,9 @@ namespace Tuvi.RestClient
                         return response.StatusCode;
                     }
                 }
-                catch (HttpRequestException ex)
+                catch (HttpRequestException ex) when (message.HttpStatus == 0) // connectivity problem
                 {
-                    if (message.HttpStatus == 0) // connectivity problem
-                    {
-                        throw new ConnectionException($"Faild to send HTTP request to {_baseUri}. ", ex);
-                    }
-                    throw;
+                    throw new ConnectionException($"Faild to send HTTP request to {_baseUri}. ", ex);
                 }
             }
         }
