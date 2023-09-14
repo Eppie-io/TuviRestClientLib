@@ -21,6 +21,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Tuvi.RestClient.Exceptions;
 
 namespace Tuvi.RestClient
 {
@@ -54,10 +55,17 @@ namespace Tuvi.RestClient
 
             using (var request = await message.CreateRequestAsync(_baseUri, cancellationToken).ConfigureAwait(false))
             {
-                using (var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false))
+                try
                 {
-                    await message.CreateResponseAsync(response, cancellationToken).ConfigureAwait(false);
-                    return response.StatusCode;
+                    using (var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false))
+                    {
+                        await message.CreateResponseAsync(response, cancellationToken).ConfigureAwait(false);
+                        return response.StatusCode;
+                    }
+                }
+                catch (HttpRequestException ex) when (message.HttpStatus == 0) // connectivity problem
+                {
+                    throw new ConnectionException($"Faild to send HTTP request to {_baseUri}. ", ex);
                 }
             }
         }
