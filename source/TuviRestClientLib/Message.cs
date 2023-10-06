@@ -68,8 +68,6 @@ namespace Tuvi.RestClient
                 Response.Headers = new HeaderCollection(response.Headers);
                 await Response.ReadContentAsync(response.Content, cancellationToken).ConfigureAwait(false);
             }
-
-            response.EnsureSuccessStatusCode();
         }
 
         internal virtual Uri BuildUri(Uri baseUri, Uri endpoint)
